@@ -1,6 +1,6 @@
 # GNU Make
 #
-# General utility library makefile.
+# Create test binaries.
 #
 # Copyright (C) 2010  Curtis Dyer
 #
@@ -23,29 +23,12 @@
 
 CC = gcc
 CFLAGS = -Wall -Wextra -pedantic -ansi -O3
-LIB = ar
 
-LIB_DIR = /usr/local/lib
-INC_DIR = /usr/local/include/dutils
-
-project = libdutil.a
 src := $(wildcard *.c)
-headers := $(patsubst %.c,%.h,$(src))
-objects := $(patsubst %.c,%.o,$(src))
+out := $(patsubst %.c,%,$(src))
 
-$(project) : $(objects)
-	$(LIB) cr $@ $^
+$(out) : $(src)
+	for i in $(out); do \
+		$(CC) $(CFLAGS) -o $$i $$i.c -ldutil; \
+	done
 
-$(objects) : $(src)
-	$(CC) $(CFLAGS) -c $^
-
-$(src) : $(headers)
-
-
-.PHONY : clean install
-clean :
-	rm -f $(objects)
-install :
-	mkdir -p $(INC_DIR)
-	cp $(headers) $(INC_DIR)
-	mv $(project) $(LIB_DIR)

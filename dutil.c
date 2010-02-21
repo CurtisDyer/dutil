@@ -1,17 +1,17 @@
 /*
- * util.c - general utilities helpful in various programs
+ * dutil.c - general utilities helpful in various programs
  *
  * Copyright (C) 2010  Curtis Dyer
  *
- * This program is free software; you can redistribute it and/or
+ * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * as published by the Free Software Foundation; either version 2 of
+ * the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this program; if not, write to the Free Software
@@ -28,7 +28,7 @@
 #include <errno.h>
 #include <assert.h>
 
-#include "util.h"
+#include "dutil.h"
 
 
 /*
@@ -72,16 +72,16 @@ char* uppercase(char *str)
 }
 
 /*
- * rtrim - remove (possibly consecutive) trailing characters specified
- * by the C string `list' (unless a null pointer is passed) from a
- * writable C string pointed to by `str'.
+ * rtrimstr - remove (possibly consecutive) trailing characters
+ * specified by the C string `list' (unless a null pointer is passed)
+ * from a writable C string pointed to by `str'.
  *
- * If `list' is a null pointer, rtrim() will use the character list
+ * If `list' is a null pointer, rtrimstr() will use the character list
  * defined by the `UTIL_SPACE' macro, which is defined in "util.h". It
  * expands to a string literal containing common whitespace
  * characters.
  */
-char* rtrim(char *str, const char *list)
+char* rtrimstr(char *str, const char *list)
 {
 	char *end;
 
@@ -99,10 +99,10 @@ char* rtrim(char *str, const char *list)
 }
 
 /*
- * ltrim - this function behaves exactly like rtrim(), except it
+ * ltrimstr - this function behaves exactly like rtrimstr(), except it
  * returns a pointer to the first character not specified in `list'.
  */
-char* ltrim(char *str, const char *list)
+char* ltrimstr(char *str, const char *list)
 {
 	assert(str != NULL);
 
@@ -185,8 +185,7 @@ char* formatnum(char *dest, long n, char sep, int group)
  * Convert `n' into a value in base `base' and store in `dest'.
  *
  * The caller is responsible for ensuring the result fits in `dest'.
- *
- * NB: the range of `base' must be [2,16], otherwise, `convbase()'
+ * The range of `base' must be in [2,16], otherwise `convbase()'
  * returns NULL.
  */
 char* convbase(char *dest, unsigned long n, int base)
