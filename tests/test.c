@@ -46,7 +46,7 @@ int main(void)
 	size = sizeof data / sizeof data[0];
 	while (i < size) {
 		printf("Original string: [%s]\n", data[i]);
-		printf("Trimmed: [%s]\n", TRIM(data[i], list));
+		printf("Trimmed: [%s]\n", TRIMSTR(data[i], list));
 
 		n = parsenum(data[i], &err);
 		if (err == 0)

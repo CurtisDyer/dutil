@@ -31,6 +31,11 @@
  * errors
  */
 enum util_errors {
+	/* getline() */
+	GETLINE_MAXMEM = 1,
+	GETLINE_NOMEM = -255,
+
+	/* parsenum() */
 	PARSENUM_NOCONV = 0x7f
 };
 
@@ -52,6 +57,7 @@ enum util_errors {
 /*
  * prototypes
  */
+/* string manipulation/conversions */
 char*	revstr(char *s);
 char*	lowercase(char *str);
 char*	uppercase(char *str);
@@ -60,5 +66,8 @@ char*	ltrimstr(char *str, const char *list);
 char*	convbase(char *dest, unsigned long n, int base);
 char*	formatnum(char *dest, long n, char sep, int group);
 long	parsenum(const char *src, int *err);
+
+/* I/O utilities */
+int		getline(char **buf, size_t *sz, size_t maxsz, FILE *fp);
 
 #endif /* DUTILS_H_ */

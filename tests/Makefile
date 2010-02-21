@@ -29,6 +29,6 @@ out := $(patsubst %.c,%,$(src))
 
 $(out) : $(src)
 	for i in $(out); do \
-		$(CC) $(CFLAGS) -o $$i $$i.c -ldutil; \
+	$(CC) $(CFLAGS) -o $$i $$i.c -ldutil -ldynstr; \
 	done
 

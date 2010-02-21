@@ -202,3 +202,88 @@ char* convbase(char *dest, unsigned long n, int base)
 	return revstr(dest);
 }
 
+/*
+ * dyn_getline - get a line from the stream pointed to by `fp',
+ * storing the result into the buffer pointed to by `buf'. The size of
+ * the buffer will be extended automatically if the line is
+ * sufficiently long. However, if `maxsz' is nonzero, a line longer
+ * than `maxsz' will not be copied. The size of the buffer will be
+ * stored in the size_t object pointed to by `sz'
+ *
+ * If `*buf == NULL', initial memory will be allocated automatically.
+ * Otherwise, `getline()' will attempt to use the buffer as-is, in
+ * which case, `sz' should point to the size of the buffer you
+ * allocated.
+ *
+ * Regardless of whether or not the buffer is allocated by
+ * `getline()', the caller is responsible for `free()'ing the memory.
+ *
+ * Return values
+ *
+ *		GETLINE_MAXMEM	- The line was longer than `maxsz'
+ *		GETLINE_NOMEM	- Memory allocation error
+ *
+ *		EOF				- End of file reached (you must call ferror()
+ *						  on the stream to distinguish between a read
+ *						  error and EOF)
+ */
+int getline( char **buf, size_t *sz, size_t maxsz, FILE *fp )
+{
+	int ch = 0, rc = 0;
+	int chkmax = maxsz > 0;
+	size_t len;
+	size_t newsz = *sz;
+	char *tmp = NULL;
+
+	assert(buf != NULL && sz != NULL);
+
+	if (*buf == NULL) {
+		*sz = *sz == 0 ? BUFSIZ : *sz;
+		if ((*buf = malloc(*sz)) == NULL)
+			rc = GETLINE_NOMEM;
+	}
+
+	len = 0;
+	while (rc == 0 && (ch = fgetc(fp)) != EOF && ch != '\n') {
+		if (chkmax && *sz >= maxsz) {
+			rc = GETLINE_MAXMEM;
+			break;
+		}
+
+		if (len + 2 >= *sz) {
+			if (newsz < 250) {
+				newsz += 100;
+			}
+			else {
+				newsz = 3 * newsz / 2;
+			}
+
+			if (chkmax && newsz > maxsz) {
+				newsz = maxsz;
+			}
+
+			/* Attempt to resize memory block */
+			if ((tmp = realloc(*buf, newsz)) != NULL) {
+				*buf = tmp;
+				*sz = newsz;
+				tmp = NULL;
+			}
+			else {
+				rc = GETLINE_NOMEM;
+			}
+		}
+
+		/* Store char read from input stream */
+		if (rc == 0) {
+			(*buf)[len++] = ch;
+		}
+	}
+
+	if (rc != GETLINE_NOMEM)
+		(*buf)[len] = '\0';
+
+	if (ch == EOF)
+		rc = EOF;
+
+	return rc;
+}
