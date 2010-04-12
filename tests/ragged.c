@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *
- * The author may be contacted at:  <dyer85@gmail.com>
+ * The author may be contacted at:	<dyer85@gmail.com>
  */
 
 #include <stdio.h>
@@ -37,11 +37,11 @@
 int main(int argc, char **argv)
 {
 	DYNSTR *data[MAX_LINES];
-    FILE *fp;
-    const char *file = __FILE__;
-    char *line = NULL;
-    int count = 0;
-    int status = 0;
+	FILE *fp;
+	const char *file = __FILE__;
+	char *line = NULL;
+	int count = 0;
+	int status = 0;
 	size_t size = 0;
 
 	if (argc == 2) {
@@ -58,32 +58,33 @@ int main(int argc, char **argv)
 		}
 	}
 
-    if ((fp = fopen(file, "r")) == NULL) {
-        perror("");
-        return EXIT_FAILURE;
-    }
+	if ((fp = fopen(file, "r")) == NULL) {
+		perror("");
+		return EXIT_FAILURE;
+	}
 
-    for (; (status = getline(&line, &size, 0, fp)) == 0; ++count) {
-        if (count >= MAX_LINES) break;
+	for (; (status = getline(&line, &size, 0, fp)) == 0; ++count) {
+		if (count >= MAX_LINES)
+			break;
 
-        data[count] = dyn_start(strlen(line) + 1);
-        if (data[count] != NULL) {
-            if (dyn_push(data[count], line) == NULL) {
-                fputs("Memory error.\n", stderr);
-                return EXIT_FAILURE;
-            }
-            else {
-                printf("%d: '%s'\n", count+1, dyn_get_data(data[count],0));
-            }
-        }
-        else {
-            fputs("Memory error.\n", stderr);
-        }
-    }
+		data[count] = dyn_start(strlen(line) + 1);
+		if (data[count] != NULL) {
+			if (dyn_push(data[count], line) == NULL) {
+				fputs("Memory error.\n", stderr);
+				return EXIT_FAILURE;
+			}
+			else {
+				printf("%d: '%s'\n", count+1, dyn_get_data(data[count],0));
+			}
+		}
+		else {
+			fputs("Memory error.\n", stderr);
+		}
+	}
 
-    /* free memory */
-    while (count--)
-        dyn_clean(data[count]);
+	/* free memory */
+	while (count--)
+		dyn_clean(data[count]);
 
 	return 0;
 }

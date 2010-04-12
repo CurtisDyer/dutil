@@ -31,13 +31,15 @@
 
 #include <dutils/dutil.h>
 
+#define MAXLEN	512
+
 int main(void)
 {
 	int err;
 	long n = 0;
 	size_t i = 0, size;
 	const char *list = UTIL_SPACE "-.";
-	char data[][BUFSIZ] = {
+	char data[][MAXLEN] = {
 		"\t\t   String 1iterals!\t\t\n",
 		"------ They are so useful..",
 		"\tSo are integers: 29384.\n"

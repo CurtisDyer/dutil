@@ -1,6 +1,10 @@
 /*
  * dutil.h - general utilities helpful in various programs
  *
+ * Author: Curtis Dyer
+ * License: LGPLV v2
+ * Version: 0.0.1 Alpha
+ *
  * Copyright (C) 2010  Curtis Dyer
  *
  * This library is free software; you can redistribute it and/or
@@ -14,7 +18,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this program; if not, write to the Free Software
+ * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *
@@ -26,14 +30,22 @@
 
 #include <string.h>
 
+#include "cdecl.h"	/* for functions requiring __cdecl */
+
+/*
+ * version
+ */
+enum dutil_version {
+	DUTIL_VERSION = 1UL
+};
 
 /*
  * errors
  */
-enum util_errors {
+enum dutil_errors {
 	/* getline() */
-	GETLINE_MAXMEM = 1,
 	GETLINE_NOMEM = -255,
+	GETLINE_MAXSIZE = 1,
 
 	/* parsenum() */
 	PARSENUM_NOCONV = 0x7f
@@ -43,31 +55,45 @@ enum util_errors {
  * macros
  */
 /* general whitespace characters */
-#define UTIL_SPACE		" \n\r\t\v\f"
+#define UTIL_SPACE			" \n\r\t\v\f"
 
 /* hex digits */
-#define HEX_DIGITS		"0123456789abcdef"
+#define HEX_DIGITS			"0123456789abcdef"
 
 /* get pointer to char before NUL terminator */
-#define LAST_CHAR(s)	(strchr((s),'\0') - 1)
+#define LAST_CHAR(s)		(strchr((s),'\0') - 1)
+
+/* count array elements */
+#define ARRAY_COUNT(a)		(sizeof (a) / sizeof (a)[0])
 
 /* Shortcut to trim both ends of a string */
-#define TRIMSTR(s,f)	rtrimstr(ltrimstr((s),(f)), (f))
+#define TRIMSTR(s,f)		rtrimstr(ltrimstr((s),(f)), (f))
 
 /*
  * prototypes
  */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* string manipulation/conversions */
-char*	revstr(char *s);
+char*	revstr(char *s, size_t len);
 char*	lowercase(char *str);
 char*	uppercase(char *str);
 char*	rtrimstr(char *str, const char *list);
-char*	ltrimstr(char *str, const char *list);
+char*	ltrimstr(const char *str, const char *list);
 char*	convbase(char *dest, unsigned long n, int base);
 char*	formatnum(char *dest, long n, char sep, int group);
 long	parsenum(const char *src, int *err);
 
-/* I/O utilities */
+/* I/O */
 int		getline(char **buf, size_t *sz, size_t maxsz, FILE *fp);
+
+/* binary data */
+int		CDECL(bitcount(unsigned int x));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* DUTILS_H_ */
