@@ -55,13 +55,10 @@ enum dutil_errors {
  * macros
  */
 /* general whitespace characters */
-#define UTIL_SPACE			" \n\r\t\v\f"
+#define DUTIL_SPACE			" \n\r\t\v\f"
 
 /* hex digits */
-#define HEX_DIGITS			"0123456789abcdef"
-
-/* get pointer to char before NUL terminator */
-#define LAST_CHAR(s)		(strchr((s),'\0') - 1)
+#define DUTIL_HEX			"0123456789abcdef"
 
 /* count array elements */
 #define ARRAY_COUNT(a)		(sizeof (a) / sizeof (a)[0])
@@ -76,21 +73,24 @@ enum dutil_errors {
 extern "C" {
 #endif
 
-/* string manipulation/conversions */
-char*	revstr(char *s, size_t len);
-char*	lowercase(char *str);
-char*	uppercase(char *str);
-char*	rtrimstr(char *str, const char *list);
-char*	ltrimstr(const char *str, const char *list);
-char*	convbase(char *dest, unsigned long n, int base);
-char*	formatnum(char *dest, long n, char sep, int group);
-long	parsenum(const char *src, int *err);
+/* string manipulation */
+char*	du_revstr(char *s, size_t len);
+char*	du_lowercase(char *str);
+char*	du_uppercase(char *str);
+char*	du_rtrimstr(char *str, const char *list);
+char*	du_ltrimstr(const char *str, const char *list);
+char*	du_convbase(char *dest, unsigned long n, int base);
+char*	du_formatnum(char *dest, long n, char sep, int group);
+long	du_parsenum(const char *src, int *err);
 
 /* I/O */
-int		getline(char **buf, size_t *sz, size_t maxsz, FILE *fp);
+int		du_getline(char **buf, size_t *sz, size_t maxsz, FILE *fp);
 
 /* binary data */
-int		CDECL(bitcount(unsigned int x));
+int		CDECL(du_bitcount(unsigned int x));
+
+/* miscellaneous */
+int		du_swap(void *a, void *b, void *tmp, size_t size);
 
 #ifdef __cplusplus
 }

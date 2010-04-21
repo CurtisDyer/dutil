@@ -15,8 +15,8 @@
 
 ; Linux C doesn't put underscores on labels
 %ifdef ELF_TYPE
-    %define _printf     printf
-    %define _bitcount   bitcount
+    %define _printf        printf
+    %define _du_bitcount   du_bitcount
 %endif
 
 ; Code
@@ -28,7 +28,7 @@ segment .text
     global _bitcount
     extern _printf
 
-_bitcount:
+_du_bitcount:
     enter   0,0                     ; new stack frame
 
     mov     ebx, 0

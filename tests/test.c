@@ -38,7 +38,7 @@ int main(void)
 	int err;
 	long n = 0;
 	size_t i = 0, size;
-	const char *list = UTIL_SPACE "-.";
+	const char *list = DUTIL_SPACE "-.";
 	char data[][MAXLEN] = {
 		"\t\t   String 1iterals!\t\t\n",
 		"------ They are so useful..",
@@ -50,7 +50,7 @@ int main(void)
 		printf("Original string: [%s]\n", data[i]);
 		printf("Trimmed: [%s]\n", TRIMSTR(data[i], list));
 
-		n = parsenum(data[i], &err);
+		n = du_parsenum(data[i], &err);
 		if (err == 0)
 			printf("\t - Found integer: %ld\n", n);
 

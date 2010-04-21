@@ -34,7 +34,6 @@
 
 #include "include/dutil.h"
 
-
 /*
  * revstr - perform in-place reverse of `len' characters in a string
  * pointed to by `str'. If `len' is longer than the length of the
@@ -42,7 +41,7 @@
  *
  * The caller must ensure the pointer points to a writable C string.
  */
-char* revstr(char *str, size_t len)
+char* du_revstr(char *str, size_t len)
 {
 	char t;
 	size_t i;
@@ -51,11 +50,8 @@ char* revstr(char *str, size_t len)
 	assert(str != NULL);
 
 	len = len > max ? max : len;
-	for (i = 0; i < len; ++i, --len) {
-		t = str[i];
-		str[i] = str[len];
-		str[len] = t;
-	}
+	for (i = 0; i < len; ++i, --len)
+		t = str[i], str[i] = str[len], str[len] = t;
 
 	return str;
 }
@@ -66,7 +62,7 @@ char* revstr(char *str, size_t len)
  *
  * `str' must point to a mutable C string.
  */
-char* lowercase(char *str)
+char* du_lowercase(char *str)
 {
 	char *r = str;
 	assert(str != NULL);
@@ -78,7 +74,7 @@ char* lowercase(char *str)
 /*
  * uppercase - make characters uppercase.
  */
-char* uppercase(char *str)
+char* du_uppercase(char *str)
 {
 	char *r = str;
 	assert(str != NULL);
@@ -97,7 +93,7 @@ char* uppercase(char *str)
  * It expands to a string literal containing common whitespace
  * characters.
  */
-char* rtrimstr(char *str, const char *list)
+char* du_rtrimstr(char *str, const char *list)
 {
 	char *end;
 
@@ -106,7 +102,7 @@ char* rtrimstr(char *str, const char *list)
 	if (list == NULL)
 		list = UTIL_SPACE;
 
-	end = LAST_CHAR(str);
+	end = strchr(str, '\0') - 1;
 	while (end != str && strspn(end, list) != 0)
 		end--;
 	end[1] = '\0';
@@ -121,7 +117,7 @@ char* rtrimstr(char *str, const char *list)
  * pointed to by `str' is not actually modified, unlike with
  * rtrimstr().
  */
-char* ltrimstr(const char *str, const char *list)
+char* du_ltrimstr(const char *str, const char *list)
 {
 	assert(str != NULL);
 
@@ -135,7 +131,7 @@ char* ltrimstr(const char *str, const char *list)
  * parsenum - search `src' from left to right until an integer value
  * is found or the first NUL terminator is found.
  */
-long parsenum(const char *src, int *err)
+long du_parsenum(const char *src, int *err)
 {
 	long number = 0;
 	char *endp = NULL;
@@ -175,7 +171,7 @@ long parsenum(const char *src, int *err)
  *
  * The caller is responsible for ensuring the result fits in `dest'.
  */
-char* formatnum(char *dest, long n, char sep, int group)
+char* du_formatnum(char *dest, long n, char sep, int group)
 {
 	int sign = n < 0;
 	int i = 1, digit = 0;
@@ -210,7 +206,7 @@ char* formatnum(char *dest, long n, char sep, int group)
  * The range of `base' must be in [2,16], otherwise `convbase()'
  * returns NULL.
  */
-char* convbase(char *dest, unsigned long n, int base)
+char* du_convbase(char *dest, unsigned long n, int base)
 {
 	char *r = dest;
 
@@ -252,7 +248,7 @@ char* convbase(char *dest, unsigned long n, int base)
  *						  on the stream to distinguish between a read
  *						  error and EOF)
  */
-int getline(char **buf, size_t *sz, size_t maxsz, FILE *fp)
+int du_getline(char **buf, size_t *sz, size_t maxsz, FILE *fp)
 {
 	int ch = 0, rc = 0;
 	int chkmax = maxsz > 0;
@@ -274,7 +270,7 @@ int getline(char **buf, size_t *sz, size_t maxsz, FILE *fp)
 			rc = GETLINE_MAXSIZE;
 
 		if (rc == 0 && len+2 >= *sz) {
-			newsz = newsz < 1024 ? newsz+100 : 3*newsz/2;
+			newsz = newsz < 1024 ? newsz+128 : 5*newsz/4;
 
 			if (chkmax && newsz > maxsz)
 				newsz = maxsz;
@@ -297,6 +293,34 @@ int getline(char **buf, size_t *sz, size_t maxsz, FILE *fp)
 
 	if (ch == EOF)
 		rc = EOF;
+
+	return rc;
+}
+
+/*
+ * swap - swap two objects of arbitrary type. Behavior may be
+ * undefined if the objects pointed to by `a' and `b' are not the same
+ * size, as specified by `size'. Obviously, both `a' and `b' should
+ * point to mutable storage. The `tmp' parameter is used as scratch
+ * space for swapping the two objects. The caller must provide a
+ * pointer to storage of the appropriate size.
+ *
+ * The reason the function doesn't allocate the scratch space
+ * internally is because there are situations in which it is
+ * undesirable to call malloc()/free() too frequently.
+ *
+ * The value returned is boolean: "1" indicates success, "0" failure.
+ */
+int du_swap(void *a, void *b, void *tmp, size_t size)
+{
+	int rc = 0;
+
+	if (tmp != NULL) {
+		rc = 1;
+		memcpy(tmp, a, size);
+		memcpy(a, b, size);
+		memcpy(b, tmp, size);
+	}
 
 	return rc;
 }
