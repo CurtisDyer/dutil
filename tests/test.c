@@ -50,7 +50,7 @@ int main(void)
 		printf("Original string: [%s]\n", data[i]);
 		printf("Trimmed: [%s]\n", TRIMSTR(data[i], list));
 
-		n = du_parsenum(data[i], &err);
+		n = parsenum(data[i], &err);
 		if (err == 0)
 			printf("\t - Found integer: %ld\n", n);
 
