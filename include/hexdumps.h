@@ -22,7 +22,7 @@
  * The author may be contacted at:  <dyer85@gmail.com>
  */
 
-#include <stdlib.h>
+#include <stdio.h>
 
 #ifndef HEXDUMPS_H_
 #define HEXDUMPS_H_

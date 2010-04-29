@@ -28,13 +28,13 @@ LIB = ar
 
 CFLAGS = -Wall -Wextra -pedantic -ansi -O3
 
-LIB_DIR = /usr/local/lib
-INC_DIR = /usr/local/include/dutils
-#LIB_DIR = /cygdrive/c/MinGW/lib
-#INC_DIR = /cygdrive/c/MinGW/include/dutils
+#LIB_DIR = /usr/local/lib
+#INC_DIR = /usr/local/include/dutils
+LIB_DIR = /cygdrive/c/MinGW/lib
+INC_DIR = /cygdrive/c/MinGW/include/dutils
 
-# static library name
-libname = libdutil.a
+# Library
+PROJECT = libdutil.a
 
 # Assembly build
 asm_src := $(wildcard *.asm)
@@ -46,7 +46,7 @@ obj := $(patsubst %.c,%.o,$(src))
 hdr := $(wildcard include/*.h)
 
 
-$(libname) : $(obj)
+$(PROJECT) : $(obj)
 	$(LIB) cr $@ $^ $(asm_obj)
 
 $(obj) : $(src)
@@ -59,8 +59,9 @@ $(src) : $(hdr)
 .PHONY : clean install
 clean :
 	rm -f $(obj) $(asm_obj)
+
 install :
 	mkdir -p $(INC_DIR)
 	cp $(hdr) $(INC_DIR)
-	mv $(libname) $(LIB_DIR)
+	mv $(PROJECT) $(LIB_DIR)
 

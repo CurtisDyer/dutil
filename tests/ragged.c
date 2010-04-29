@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 				return EXIT_FAILURE;
 			}
 			else {
-				printf("%d: '%s'\n", count+1, dyn_get_data(data[count],0));
+				printf("% 4d. %s\n", count+1, dyn_get_data(data[count],0));
 			}
 		}
 		else {
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* free memory */
+	/* Free memory */
 	while (count--)
 		dyn_clean(data[count]);
 
