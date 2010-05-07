@@ -1,0 +1,144 @@
+.\" dutil - getline(3)
+.TH GETLINE 3 "April 2010" "I/O Utilities" "Programmer's Manual"
+.SH NAME
+.BR getline " -- get a complete line from an input stream."
+.SH LIBRARY
+dyersWeb utility library (libdutil, \-ldutil). The library
+itself is built on
+.SM ANSI C.
+.SH SYNOPSIS
+.nf
+.B #include <dutils/dutil.h>
+
+int
+.BI "getline(char **" buf ", size_t *"sz ", size_t " maxsz ", FILE *"fp );
+.fi
+.SH DESCRIPTION
+The 
+.BR getline (3)
+function obtains a complete line from the input stream pointed to by
+.IR fp .
+All data will be included in the buffer, excluding the line terminator.
+.PP
+The
+.I buf
+parameter is a pointer to a
+.B char*
+buffer. If
+.BI * buf
+is a null pointer,
+.BR getline (3)
+will attempt to allocate initial storage for the line automatically.
+However, if
+.BI * buf
+is not a null pointer, it is assumed that the caller has arranged for
+the buffer to point to dynamic storage obtained by either
+.BR malloc (3)
+or
+.BR calloc (3).
+In this case, the
+.I sz
+parameter MUST point to a
+.B size_t
+object indicating how many bytes of storage the buffer initially
+has allocated. If
+.BR getline (3)
+must obtain additional storage for the buffer, it will update the
+object to which
+.IR sz " points."
+Regardless of whether or not the caller allocates storage for the
+buffer, the caller MUST always free the buffer.
+.PP
+The
+.I maxsz
+parameter, when greater than zero, indicates the maximum amount of
+memory, in bytes,
+.BR getline (3)
+is allowed to allocate. When increasing the storage for the buffer
+would otherwise surpass the limit,
+.B GETLINE_MAXSIZE
+is returned (see below). However, if
+.I maxsz
+is
+.BR zero ,
+there is no artificial upper limit placed upon the maximum amount of
+storage permitted for the buffer. Of course, you will always be at the
+mercy of any limitations imposed by your OS/hardware.
+.PP
+The
+.I fp
+parameter is a pointer to a
+.B FILE
+object, which should represent an input stream opened with appropriate
+permissions for reading.
+.SH "RETURN VALUES"
+Upon successful storage of a complete line,
+.B 0
+is returned. Otherwise, one of the return codes from
+.B <dutils/dutil.h>
+will be returned. The status codes will be of type
+.BR int " (thus, may be negative)."
+
+.B GETLINE_NOMEM
+.RS
+This is guaranteed to be a negative integer value. It indicates that
+additional storage was unable to be obtained for the buffer. The
+buffer's contents will remain intact and still must be freed by the
+caller.
+.PP
+.RE
+.B GETLINE_MAXSIZE
+.RS
+This is guranteed to be a positive, nonzero integer value. It only
+applies when the
+.I maxsz
+parameter is nonzero; otherwise, no size limitations are imposed.
+It indicates the maximum amount of memory has been allocated, and
+would have been exceeded, according to the
+.I maxsz
+parameter. In this case, the
+.B size_t
+object pointed to by
+.I sz
+will be set to the maximum size specified by
+.IR maxsz .
+The buffer remains intact, and the caller still must free the storage.
+.RE
+.SH EXAMPLES
+.nf
+.HP
+Writing stdin to stdout:
+
+while ((rc = getline(&buffer, &size, 0, stdin)) == 0)
+    puts(buffer);
+
+if (rc == GETLINE_NOMEM) {
+    puts(buffer);
+    fputs("<Unable to continue reading.>\\n", stderr);
+}
+.fi
+.SH "SEE ALSO"
+.BR malloc (3),
+.BR calloc (3),
+.BR free (3),
+.BR fgets (3),
+.BR dynstr_push (3)
+.SH AUTHOR
+Copyright (C) 2010  Curtis Dyer
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301, USA.
+
+The author may be contacted at:  <dyer85 a-t gmail dot com>
+
