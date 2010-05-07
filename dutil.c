@@ -46,10 +46,11 @@ char* revstr(char *str, size_t len)
 {
 	char t;
 	size_t i;
-	size_t max = strlen(str) - 1;
+	size_t max;
 
 	assert(str != NULL);
 
+	max = strlen(str) - 1;
 	len = len > max ? max : len;
 	for (i = 0; i < len; ++i, --len)
 		t = str[i], str[i] = str[len], str[len] = t;
