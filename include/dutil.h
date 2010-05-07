@@ -29,13 +29,14 @@
 #define DUTILS_H_
 
 #include <string.h>
+#include <limits.h>
 
 #include "cdecl.h"
 
 /*
  * Version
  */
-#define DUTIL_VERSION		1UL
+#define DUTIL_VERSION		001U
 
 /*
  * Errors
@@ -51,17 +52,28 @@ enum dutil_errors {
 /*
  * Macros
  */
-/* general whitespace characters */
+/* Stringize macro values */
+#define XSTR(s)				#s
+#define STRVAL(s)			XSTR(s)
+
+/* General whitespace characters */
 #define DUTIL_SPACE			" \n\r\t\v\f"
 
-/* hex digits */
+/* Hex digits */
 #define DUTIL_HEX			"0123456789abcdef"
 
-/* count array elements */
-#define ARRAY_COUNT(a)		(sizeof (a) / sizeof (a)[0])
+/* formatnum() buffer size */
+#define FORMATNUM_BUFSIZE	\
+	( \
+		sizeof STRVAL(LONG_MAX) + \
+		((sizeof STRVAL(LONG_MAX) - 1) / 3) \
+	)
+
+/* convbase() buffer size */
+#define CONVBASE_BUFSIZE	(sizeof(unsigned long) * CHAR_BIT + 1)
 
 /* Shortcut to trim both ends of a string */
-#define TRIMSTR(s,f)		rtrimstr(ltrimstr((s),(f)), (f))
+#define TRIMSTR(s,f)	rtrimstr(ltrimstr((s),(f)), (f))
 
 /*
  * prototypes

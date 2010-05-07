@@ -22,13 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
  * 02110-1301, USA.
  *
- * The author may be contacted at:  <dyer85@gmail.com>
+ * The author may be contacted at:	<dyer85@gmail.com>
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 #include <errno.h>
 #include <assert.h>
 
@@ -170,37 +171,49 @@ long parsenum(const char *src, int *err)
  * separated by `sep'. The result is written to `dest'.
  *
  * The caller is responsible for ensuring the result fits in `dest'.
+ * <dutils/dutil.h> provides FORMATNUM_BUFSIZE expands to a `size_t'
+ * value representing a size sufficient for holding the longest
+ * possible signed `long' integer. It accounts for the separator,
+ * negative sign, and NUL terminator.
  */
 char* formatnum(char *dest, long n, char sep, int group)
 {
-	int sign = n < 0;
+	int sign;
 	int i = 1, digit = 0;
-	char *r = dest;
+	char *end = dest + FORMATNUM_BUFSIZE;
 
 	assert(dest != NULL);
 
-	while (n > 0) {
+	sign = n < 0;
+	*--end = '\0';
+
+	for (i = 1; n != 0; ++i, n /= 10) {
+		/*
+		 * I prefer this approach to negating `n' itself, because if
+		 * "n == LONG_MIN", negating it will overflow.
+		 */
 		if ((digit = n % 10) < 0)
 			digit = -digit;
-		*dest++ = digit + '0';
 
+		*--end = digit + '0';
 		if (n / 10 != 0 && (i % group) == 0)
-			*dest++ = sep;
-
-		n /= 10;
-		i++;
+			*--end = sep;
 	}
-
 	if (sign)
-		*dest++ = '-';
-	*dest = '\0';
+		*--end = '-';
 
-	return revstr(r, (size_t)(dest-r));
+	return end;
 }
 
 /*
  * convbase - convert `n' into a value in base `base' and store in
  * `dest'.
+ *
+ * The buffer size can easily be determined with:
+ *
+ *		sizeof n * CHAR_BIT + 1
+ *
+ * `CHAR_BIT' is part of ISO C, and is defined in <limits.h>
  *
  * The caller is responsible for ensuring the result fits in `dest'.
  * The range of `base' must be in [2,16], otherwise `convbase()'
@@ -208,18 +221,19 @@ char* formatnum(char *dest, long n, char sep, int group)
  */
 char* convbase(char *dest, unsigned long n, int base)
 {
-	char *r = dest;
+
+	char *ret = dest + sizeof n * CHAR_BIT;
 
 	if (base < 2 || base > (int)sizeof DUTIL_HEX - 1)
 		return NULL;
 
+	*ret = '\0';
 	do {
-		*dest++ = DUTIL_HEX[n % base];
+		*--ret = DUTIL_HEX[n % base];
 		n /= base;
-	} while (n != 0);
-	*dest = '\0';
+	} while (n > 0);
 
-	return revstr(r, (size_t)(dest-r));
+	return ret;
 }
 
 /*
@@ -259,7 +273,13 @@ int getline(char **buf, size_t *sz, size_t maxsz, FILE *fp)
 	assert(buf != NULL && sz != NULL);
 
 	if (*buf == NULL) {
-		*sz = *sz == 0 ? BUFSIZ : *sz;
+		if (*sz == 0 && chkmax && maxsz < BUFSIZ)
+			*sz = maxsz;
+		else if (*sz == 0)
+			*sz = BUFSIZ;
+		else if (*sz > 0 && chkmax && *sz > maxsz)
+			*sz = maxsz;
+
 		if ((*buf = malloc(*sz)) == NULL)
 			rc = GETLINE_NOMEM;
 	}
@@ -270,7 +290,7 @@ int getline(char **buf, size_t *sz, size_t maxsz, FILE *fp)
 			rc = GETLINE_MAXSIZE;
 
 		if (rc == 0 && len+2 >= *sz) {
-			newsz = newsz < 1024 ? newsz+128 : 5*newsz/4;
+			newsz += newsz < 1024 ? 128 : newsz/2;
 
 			if (chkmax && newsz > maxsz)
 				newsz = maxsz;
@@ -284,8 +304,6 @@ int getline(char **buf, size_t *sz, size_t maxsz, FILE *fp)
 				rc = GETLINE_NOMEM;
 			}
 		}
-
-		/* Store char read from input stream */
 		(*buf)[len++] = ch;
 	}
 

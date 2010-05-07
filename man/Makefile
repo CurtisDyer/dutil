@@ -1,6 +1,6 @@
 # GNU Make
 #
-# General utility library makefile.
+# Create test binaries.
 #
 # Copyright (C) 2010  Curtis Dyer
 #
@@ -21,47 +21,19 @@
 #
 # The author may be contacted at:  <dyer85@gmail.com>
 
-CC = gcc
-ASM = nasm
-FORMAT = coff
-LIB = ar
+ARCHIVE = gzip
+EXT = gz
+MANDIR = /usr/share/man/man3
 
-CFLAGS = -Wall -Wextra -pedantic -ansi -O3
+SRC := $(wildcard *.3)
+OUT := $(patsubst %.3,%.3.$(EXT),$(SRC))
 
-LIB_DIR = /usr/local/lib
-INC_DIR = /usr/local/include/dutils
-#LIB_DIR = /cygdrive/c/MinGW/lib
-#INC_DIR = /cygdrive/c/MinGW/include/dutils
+$(OUT) : $(SRC)
+	for i in $^; do \
+		$(ARCHIVE) -c -9 $$i > $(MANDIR)/$$i.$(EXT); \
+	done
 
-# Library
-PROJECT = libdutil.a
-
-# Assembly build
-asm_src := $(wildcard *.asm)
-asm_obj := $(patsubst %.asm,%.o,$(asm_src))
-
-# C build
-src := $(wildcard *.c)
-obj := $(patsubst %.c,%.o,$(src))
-hdr := $(wildcard include/*.h)
-
-
-$(PROJECT) : $(obj)
-	$(LIB) cr $@ $^ $(asm_obj)
-
-$(obj) : $(src)
-	$(ASM) -f $(FORMAT) $(asm_src)
-	$(CC) $(CFLAGS) -c $^
-
-$(src) : $(hdr)
-
-
-.PHONY : clean install
+.PHONY : clean
 clean :
-	rm -f $(obj) $(asm_obj)
-
-install :
-	mkdir -p $(INC_DIR)
-	cp $(hdr) $(INC_DIR)
-	mv $(PROJECT) $(LIB_DIR)
+	rm -f *.$(EXT)
 

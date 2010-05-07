@@ -32,3 +32,7 @@ $(out) : $(src)
 	$(CC) $(CFLAGS) -o $$i $$i.c -ldutil -ldynstr; \
 	done
 
+.PHONY : clean
+clean :
+	rm -f *.exe
+
