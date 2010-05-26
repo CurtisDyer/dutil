@@ -14,6 +14,27 @@ PURPOSE OF THE LIBRARY
 
     Note an official release is still quite a way's off.
 
+LICENSE
+
+    This library is licensed under the LGPL.
+
+    Copyright (C) 2010  Curtis Dyer
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public License
+    as published by the Free Software Foundation; either version 2 of
+    the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+    Boston, MA 02110-1301, USA.
+
 PORTABILITY
 
     Since the library is built on ANSI C, it should be able to compile
@@ -35,7 +56,15 @@ INSTALLATION
         $ make install
         $ make clean
 
-    The `make' command compiles
+    The `make' command compiles the source code and produces a static
+    library. Which compiler and archive tool to use can be configured
+    within the makefile easily.
+
+    The `make install' command actually moves the header files and
+    library into the install paths specified.
+
+    The `make clean' command removes the object files and local
+    library file.
 
     This process works fine in Cygwin, and should also work fine if
     you have a copy of `GNU make'. Making this library more
