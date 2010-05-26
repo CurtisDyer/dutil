@@ -69,9 +69,6 @@ enum dutil_errors {
 		((sizeof STRVAL(LONG_MAX) - 1) / 3) \
 	)
 
-/* convbase() buffer size */
-#define CONVBASE_BUFSIZE	(sizeof(unsigned long) * CHAR_BIT + 1)
-
 /* Shortcut to trim both ends of a string */
 #define TRIMSTR(s,f)	rtrimstr(ltrimstr((s),(f)), (f))
 

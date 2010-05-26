@@ -46,11 +46,13 @@ char* revstr(char *str, size_t len)
 {
 	char t;
 	size_t i;
-	size_t max = strlen(str) - 1;
+	size_t max;
 
 	assert(str != NULL);
 
+	max = strlen(str) - 1;
 	len = len > max ? max : len;
+
 	for (i = 0; i < len; ++i, --len)
 		t = str[i], str[i] = str[len], str[len] = t;
 
@@ -66,9 +68,12 @@ char* revstr(char *str, size_t len)
 char* lowercase(char *str)
 {
 	char *r = str;
+
 	assert(str != NULL);
+
 	while (tolower((unsigned char)*str) != '\0')
 		str++;
+
 	return r;
 }
 
@@ -78,9 +83,12 @@ char* lowercase(char *str)
 char* uppercase(char *str)
 {
 	char *r = str;
+
 	assert(str != NULL);
+
 	while (toupper((unsigned char)*str) != '\0')
 		str++;
+
 	return r;
 }
 
@@ -90,7 +98,7 @@ char* uppercase(char *str)
  * from a writable C string pointed to by `str'.
  *
  * If `list' is a null pointer, rtrimstr() will use the character list
- * defined by the `UTIL_SPACE' macro, which is defined in "dutil.h".
+ * defined by the `DUTIL_SPACE' macro, which is defined in "dutil.h".
  * It expands to a string literal containing common whitespace
  * characters.
  */
@@ -131,6 +139,10 @@ char* ltrimstr(const char *str, const char *list)
 /*
  * parsenum - search `src' from left to right until an integer value
  * is found or the first NUL terminator is found.
+ *
+ * TODO: return the error code and store result using a pointer. Since
+ * this function is deliberately careful about error checking, it's
+ * unlikely it won't be used by the caller.
  */
 long parsenum(const char *src, int *err)
 {
@@ -143,8 +155,8 @@ long parsenum(const char *src, int *err)
 	if (err) *err = PARSENUM_NOCONV;
 
 	while (*src != '\0') {
-		ch = *src;
-		peek = *(src + 1);
+		ch = src[0];
+		peek = src[1];
 		if (!isdigit(ch)) {
 			if (ch == '-' && isdigit(peek))
 				break;
@@ -180,17 +192,19 @@ char* formatnum(char *dest, long n, char sep, int group)
 {
 	int sign;
 	int i = 1, digit = 0;
-	char *end = dest + FORMATNUM_BUFSIZE;
+	char *end;
 
 	assert(dest != NULL);
+
+	end = dest + FORMATNUM_BUFSIZE;
 
 	sign = n < 0;
 	*--end = '\0';
 
 	for (i = 1; n != 0; ++i, n /= 10) {
 		/*
-		 * I prefer this approach to negating `n' itself, because if
-		 * "n == LONG_MIN", negating it will overflow.
+			I prefer this approach to negating `n' itself, because if
+			"n == LONG_MIN", negating it will overflow.
 		 */
 		if ((digit = n % 10) < 0)
 			digit = -digit;
@@ -222,7 +236,11 @@ char* formatnum(char *dest, long n, char sep, int group)
 char* convbase(char *dest, unsigned long n, int base)
 {
 
-	char *ret = dest + sizeof n * CHAR_BIT;
+	char *ret;
+
+	assert(dest != NULL);
+
+	ret = dest + sizeof n * CHAR_BIT;
 
 	if (base < 2 || base > (int)sizeof DUTIL_HEX - 1)
 		return NULL;

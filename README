@@ -1,0 +1,65 @@
+                   dyersWeb Utility Library: dutil
+
+Author: Curtis Dyer
+Email: dyer85 [at] gmail [dot] com
+License: LGPL
+Version: pre-alpha
+
+PURPOSE OF THE LIBRARY
+
+    The purpose of this library is to provide some general purpose,
+    common utilities that come in handy when writing C programs.
+    Generally, the library handles some extended string formatting,
+    number conversions, and I/O.
+
+    Note an official release is still quite a way's off.
+
+PORTABILITY
+
+    Since the library is built on ANSI C, it should be able to compile
+    nearly anywhere there's a C implementation to be found.
+
+INSTALLATION
+
+    This library can be built using the makefile in the root
+    directory. The other makefiles will build things like test drivers
+    or the man pages, which contain all the documentation on the
+    functions.
+
+    I haven't set up a configure script, so you'd need to adjust
+    installation paths by hand in each makefile.
+
+    Once the makefiles are set up how you like, simply run
+
+        $ make
+        $ make install
+        $ make clean
+
+    The `make' command compiles
+
+    This process works fine in Cygwin, and should also work fine if
+    you have a copy of `GNU make'. Making this library more
+    installation friendly for more platforms is, for now, on my TODO
+    stack.
+
+DOCUMENTATION
+
+    As mentioned above, the documentation is currently contained
+    within the man pages in the $root/man directory. The makefile
+    contained within that directory will use `groff' to produce man
+    pages. You can edit the makefile to produce the documentation
+    differently, if you like.
+
+    Making the docs more readily available, say online, is buried
+    somewhere in my TODO stack (rest assured, not too deep).
+
+WHY THE ASM?
+
+    The `bitcount.asm' file is an artifact of my messing around. I'm
+    aware seriously using it is premature optimization.
+
+QUESTIONS?
+
+    If you have any questions, criticisms, complaints, feel free to email
+    me or contact me through github.
+
