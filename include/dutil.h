@@ -39,14 +39,14 @@
 #define DUTIL_VERSION		001U
 
 /*
- * Errors
+ * Error/Status codes
  */
-enum dutil_errors {
-	GETLINE_NOMEM = -255,
-	GETLINE_MAXSIZE = 1,
+#define FGETLN_NOMEM		(-255)
+#define FGETLN_MAXSIZE		1
 
-	PARSENUM_NOCONV = 127
-};
+#define PARSENUM_OVERFLOW	(-1)
+#define PARSENUM_UNDERFLOW	(-2)
+#define PARSENUM_NOCONV		1
 
 
 /*
@@ -83,17 +83,17 @@ extern "C" {
 #endif
 
 /* String manipulation */
-char*	revstr(char *s, size_t len);
+char*	revstr(char *s);
 char*	lowercase(char *str);
 char*	uppercase(char *str);
 char*	rtrimstr(char *str, const char *list);
 char*	ltrimstr(const char *str, const char *list);
 char*	convbase(char *dest, unsigned long n, int base);
 char*	formatnum(char *dest, long n, char sep, int group);
-long	parsenum(const char *src, int *err);
+int		parsenum(const char *src, long *err);
 
 /* I/O */
-int		getline(char **buf, size_t *sz, size_t maxsz, FILE *fp);
+int		fgetln(char **buf, size_t *sz, size_t maxsz, FILE *fp);
 
 /* Bit manipulation */
 int		CDECL(bitcount(unsigned int x));

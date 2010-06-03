@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	for (; (status = getline(&line, &size, 0, fp)) == 0; ++count) {
+	for (; (status = fgetln(&line, &size, 0, fp)) == 0; ++count) {
 		if (count >= MAX_LINES)
 			break;
 

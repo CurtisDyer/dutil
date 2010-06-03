@@ -36,24 +36,20 @@
 #include "include/dutil.h"
 
 /*
- * revstr - perform in-place reverse of `len' characters in a string
- * pointed to by `str'. If `len' is longer than the length of the
- * string, the whole string will be reversed.
+ * revstr - perform in-place reverse of characters in a string
+ * pointed to by `str'.
  *
  * The caller must ensure the pointer points to a writable C string.
  */
-char* revstr(char *str, size_t len)
+char* revstr(char *str)
 {
 	char t;
-	size_t i;
-	size_t max;
+	size_t i, j;
 
 	assert(str != NULL);
 
-	max = strlen(str) - 1;
-	len = len > max ? max : len;
-	for (i = 0; i < len; ++i, --len)
-		t = str[i], str[i] = str[len], str[len] = t;
+	for (i = 0, j = strlen(str)-1; i < j; ++i, --j)
+		t = str[i], str[i] = str[j], str[j] = t;
 
 	return str;
 }
@@ -133,19 +129,18 @@ char* ltrimstr(const char *str, const char *list)
  * parsenum - search `src' from left to right until an integer value
  * is found or the first NUL terminator is found.
  */
-long parsenum(const char *src, int *err)
+int parsenum(const char *src, long *num)
 {
-	long number = 0;
+	int rc = PARSENUM_NOCONV;
 	char *endp = NULL;
-	unsigned char ch = '\0', peek = '\0';
 
 	assert(src != NULL);
-
-	if (err) *err = PARSENUM_NOCONV;
+	assert(num != NULL);
 
 	while (*src != '\0') {
-		ch = *src;
-		peek = *(src + 1);
+		unsigned char ch = src[0];
+		unsigned char peek = src[1];
+
 		if (!isdigit(ch)) {
 			if (ch == '-' && isdigit(peek))
 				break;
@@ -159,12 +154,19 @@ long parsenum(const char *src, int *err)
 
 	if (*src != '\0') {
 		errno = 0;
-		number = strtol(src, &endp, 10);
-		if (err != NULL && endp != src)
-			*err = errno != 0 ? errno : 0;
+		*num = strtol(src, &endp, 10);
+		if (errno == ERANGE) {
+			if (rc && *num == LONG_MAX)
+				rc = PARSENUM_OVERFLOW;
+			else if (rc && *num == LONG_MIN)
+				rc = PARSENUM_UNDERFLOW;
+		}
+		else if (endp != src) {
+			rc = 0;
+		}
 	}
 
-	return number;
+	return rc;
 }
 
 /*
@@ -238,32 +240,31 @@ char* convbase(char *dest, unsigned long n, int base)
 }
 
 /*
- * getline - get a line from the stream pointed to by `fp', storing
+ * fgetln - get a line from the stream pointed to by `fp', storing
  * the result into the buffer pointed to by `buf'. The size of the
  * buffer will be extended automatically if the line is sufficiently
  * long. However, if `maxsz' is nonzero, a line longer than `maxsz'
- * will not be copied and the maximum amount getline() will attempt to
+ * will not be copied and the maximum amount fgetln() will attempt to
  * allocate will be no larger than `maxsz'. The current size of the
  * buffer will be stored in the size_t object pointed to by `sz'
  *
  * If `*buf == NULL', initial memory will be allocated automatically.
- * Otherwise, `getline()' will attempt to use the buffer as-is, in
+ * Otherwise, `fgetln()' will attempt to use the buffer as-is, in
  * which case, `sz' should point to the size of the buffer you
  * allocated.
  *
- * Regardless of whether or not the buffer is allocated by getline(),
+ * Regardless of whether or not the buffer is allocated by fgetln(),
  * the caller is responsible for the memory of the buffer.
  *
  * Return values
  *
- *		GETLINE_MAXSIZE	- The line was longer than `maxsz'
- *		GETLINE_NOMEM	- Memory allocation error
- *
+ *		FGETLN_MAXSIZE	- The line was longer than `maxsz'
+ *		FGETLN_NOMEM	- Memory allocation error
  *		EOF				- End of file reached (you must call ferror()
  *						  on the stream to distinguish between a read
  *						  error and EOF)
  */
-int getline(char **buf, size_t *sz, size_t maxsz, FILE *fp)
+int fgetln(char **buf, size_t *sz, size_t maxsz, FILE *fp)
 {
 	int ch = 0, rc = 0;
 	int chkmax = maxsz > 0;
@@ -282,13 +283,13 @@ int getline(char **buf, size_t *sz, size_t maxsz, FILE *fp)
 			*sz = maxsz;
 
 		if ((*buf = malloc(*sz)) == NULL)
-			rc = GETLINE_NOMEM;
+			rc = FGETLN_NOMEM;
 	}
 
 	len = 0;
 	while (rc == 0 && (ch = getc(fp)) != EOF && ch != '\n') {
 		if (chkmax && len+2 >= maxsz)
-			rc = GETLINE_MAXSIZE;
+			rc = FGETLN_MAXSIZE;
 
 		if (rc == 0 && len+2 >= *sz) {
 			newsz += newsz < 1024 ? 128 : newsz/2;
@@ -302,7 +303,7 @@ int getline(char **buf, size_t *sz, size_t maxsz, FILE *fp)
 				tmp = NULL;
 			}
 			else {
-				rc = GETLINE_NOMEM;
+				rc = FGETLN_NOMEM;
 			}
 		}
 		(*buf)[len++] = ch;

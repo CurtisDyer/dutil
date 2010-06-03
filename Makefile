@@ -30,8 +30,6 @@ CFLAGS = -Wall -Wextra -pedantic -ansi -O3
 
 LIB_DIR = /usr/local/lib
 INC_DIR = /usr/local/include/dutils
-#LIB_DIR = /cygdrive/c/MinGW/lib
-#INC_DIR = /cygdrive/c/MinGW/include/dutils
 
 # Library
 PROJECT = libdutil.a
