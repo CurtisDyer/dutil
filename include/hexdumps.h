@@ -28,7 +28,7 @@
 #define HEXDUMPS_H_
 
 #ifdef __cplusplus
-exter "C" {
+extern "C" {
 #endif
 
 /* Macros */

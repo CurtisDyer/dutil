@@ -1,7 +1,7 @@
-.\" dutil - getline(3)
-.TH GETLINE 3 "April 2010" "I/O Utilities" "Programmer's Manual"
+.\" dutil - fgetln(3)
+.TH FGETLN 3 "April 2010" "I/O Utilities" "Programmer's Manual"
 .SH NAME
-.BR getline " -- get a complete line from an input stream."
+.BR fgetln " -- get a complete line from an input stream."
 .SH LIBRARY
 dyersWeb utility library (libdutil, \-ldutil). The library
 itself is built on
@@ -11,11 +11,11 @@ itself is built on
 .B #include <dutils/dutil.h>
 
 int
-.BI "getline(char **" buf ", size_t *"sz ", size_t " maxsz ", FILE *"fp );
+.BI "fgetln(char **" buf ", size_t *"sz ", size_t " maxsz ", FILE *"fp );
 .fi
 .SH DESCRIPTION
 The 
-.BR getline (3)
+.BR fgetln (3)
 function obtains a complete line from the input stream pointed to by
 .IR fp .
 All data will be included in the buffer, excluding the line terminator.
@@ -27,7 +27,7 @@ parameter is a pointer to a
 buffer. If
 .BI * buf
 is a null pointer,
-.BR getline (3)
+.BR fgetln (3)
 will attempt to allocate initial storage for the line automatically.
 However, if
 .BI * buf
@@ -42,7 +42,7 @@ parameter MUST point to a
 .B size_t
 object indicating how many bytes of storage the buffer initially
 has allocated. If
-.BR getline (3)
+.BR fgetln (3)
 must obtain additional storage for the buffer, it will update the
 object to which
 .IR sz " points."
@@ -53,10 +53,10 @@ The
 .I maxsz
 parameter, when greater than zero, indicates the maximum amount of
 memory, in bytes,
-.BR getline (3)
+.BR fgetln (3)
 is allowed to allocate. When increasing the storage for the buffer
 would otherwise surpass the limit,
-.B GETLINE_MAXSIZE
+.B FGETLN_MAXSIZE
 is returned (see below). However, if
 .I maxsz
 is
@@ -79,7 +79,19 @@ is returned. Otherwise, one of the return codes from
 will be returned. The status codes will be of type
 .BR int " (thus, may be negative)."
 
-.B GETLINE_NOMEM
+.B EOF
+.RS
+The value is the actual
+.B EOF
+macro, the behavior of which is currently defined by ISO/IEC 9899:1999
+(C99). A value of
+.B EOF
+indicates that end-of-file has been reached or that an input error has
+occurred. To determine which, use the Standard C
+.BR feof "(3) and " ferror "(3) functions."
+.PP
+.RE
+.B FGETLN_NOMEM
 .RS
 This is guaranteed to be a negative integer value. It indicates that
 additional storage was unable to be obtained for the buffer. The
@@ -87,7 +99,7 @@ buffer's contents will remain intact and still must be freed by the
 caller.
 .PP
 .RE
-.B GETLINE_MAXSIZE
+.B FGETLN_MAXSIZE
 .RS
 This is guranteed to be a positive, nonzero integer value. It only
 applies when the
@@ -109,10 +121,10 @@ The buffer remains intact, and the caller still must free the storage.
 .HP
 Writing stdin to stdout:
 
-while ((rc = getline(&buffer, &size, 0, stdin)) == 0)
+while ((rc = fgetln(&buffer, &size, 0, stdin)) == 0)
     puts(buffer);
 
-if (rc == GETLINE_NOMEM) {
+if (rc == FGETLN_NOMEM) {
     puts(buffer);
     fputs("<Unable to continue reading.>\\n", stderr);
 }

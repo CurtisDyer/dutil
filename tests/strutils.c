@@ -36,7 +36,6 @@
 
 int main(void)
 {
-	int err;
 	long n = 0;
 	size_t i = 0, size;
 	const char *list = DUTIL_SPACE "-.";
@@ -46,16 +45,15 @@ int main(void)
 		"\tSo are integers: 29384.  \t"
 	};
 
-	puts("Trimming strings of white space, dashes, and periods.");
-	puts("Any integers found in strings are also reported.\n");
+	puts("Trimming strings of white space, dashes, and periods.\n"
+			"Any integers found in strings are also reported.\n");
 
 	size = sizeof data / sizeof *data;
 	while (i < size) {
 		printf("Original string:\n\t[%s]\n", data[i]);
 		printf("Trimming both sides:\n\t[%s]\n", TRIMSTR(data[i], list));
 
-		n = parsenum(data[i], &err);
-		if (err == 0)
+		if (parsenum(data[i], &n) == 0)
 			printf("\t- Found integer: %ld\n", n);
 
 		putchar('\n');

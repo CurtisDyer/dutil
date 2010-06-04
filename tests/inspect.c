@@ -31,21 +31,11 @@
 #include <limits.h>
 #include <dutils/hexdumps.h>
 
-void intro(void)
-{
-	puts("This program demonstrates vardump() by outputting the");
-	puts("hexdumps of the `struct data' object and all of its");
-	puts("individual members.\n");
-	puts("The hexdump is a representation of how the objects");
-	puts("are actually mapped out in memory. hexdump() behaves");
-	puts("just like vardump(), except it outputs the contents of");
-	puts("a file as a hexdump.\n");
-}
-
-
-enum {
-	B, S, I, D, STR, P, ARR
-};
+/*
+ * TODO: after implementing a proper hash library, update this
+ * approach to not be ugly.
+ */
+enum { B, S, I, D, STR, P, ARR };
 
 struct data {
 	unsigned char b;
@@ -56,6 +46,18 @@ struct data {
 	char *p;
 	int arr[5];
 };
+
+void intro(void)
+{
+	puts("This program demonstrates vardump() by outputting the");
+	puts("hexdumps of the `struct data' object and all of its");
+	puts("individual members.\n");
+
+	puts("The hexdump is a representation of how the objects");
+	puts("are actually mapped out in memory. hexdump() behaves");
+	puts("just like vardump(), except it outputs the contents of");
+	puts("a file as a hexdump.\n");
+}
 
 int main(void)
 {
