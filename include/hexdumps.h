@@ -32,6 +32,7 @@ extern "C" {
 #endif
 
 /* Macros */
+<<<<<<< HEAD
 #define BYTE_COLS		16
 #define BYTE_SEP_LEN	4
 
@@ -41,6 +42,17 @@ extern "C" {
 /* Prototypes */
 void	vardump(void *data, size_t n, int cols, int width);
 void	fdump(FILE *in, int cols, int width);
+=======
+#define BYTE_COLS		8
+#define BYTE_SEP_LEN	4
+
+#define IS_NEW_ROW(n) ( 0 == ((n) % (BYTE_COLS)) )
+#define SPACES(n) ( (((BYTE_COLS) - ((n) % (BYTE_COLS))) * (BYTE_SEP_LEN)) )
+
+/* Prototypes */
+void	vardump(void *data, size_t n);
+void	hexdump(FILE *in);
+>>>>>>> d7e57a9b5358265a322dc44ff1812ce1c3f1b968
 
 #ifdef __cplusplus
 }
