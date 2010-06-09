@@ -32,15 +32,15 @@ extern "C" {
 #endif
 
 /* Macros */
-#define BYTE_COLS		8
+#define BYTE_COLS		16
 #define BYTE_SEP_LEN	4
 
-#define IS_NEW_ROW(n) ( 0 == ((n) % (BYTE_COLS)) )
-#define SPACES(n) ( (((BYTE_COLS) - ((n) % (BYTE_COLS))) * (BYTE_SEP_LEN)) )
+#define IS_NEW_ROW(n,c) ( ((n) % (c)) == 0 )
+#define SPACES(n,c,w) ( (((c) - ((n) % (c))) * (w)) )
 
 /* Prototypes */
-void	vardump(void *data, size_t n);
-void	hexdump(FILE *in);
+void	vardump(void *data, size_t n, int cols, int width);
+void	fdump(FILE *in, int cols, int width);
 
 #ifdef __cplusplus
 }

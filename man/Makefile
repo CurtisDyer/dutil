@@ -25,15 +25,28 @@ ARCHIVE = gzip
 EXT = gz
 MANDIR = /usr/share/man/man3
 
-SRC := $(wildcard *.3)
-OUT := $(patsubst %.3,%.3.$(EXT),$(SRC))
+# Don't compress these
+INC := hexdumps.3
 
-$(OUT) : $(SRC)
+ZIP := fdump.3 vardump.3 fgetln.3
+OUT := $(patsubst %.3, %.3.$(EXT), $(ZIP))
+
+$(OUT) : $(ZIP)
 	for i in $^; do \
-		$(ARCHIVE) -c -9 $$i > $(MANDIR)/$$i.$(EXT); \
-	done
+	$(ARCHIVE) -c -9 $$i > $$i.$(EXT); \
+done; \
 
-.PHONY : clean
+.PHONY : clean install uninstall
 clean :
 	rm -f *.$(EXT)
+
+install :
+	for i in $(OUT) $(INC); do \
+	cp $$i $(MANDIR); \
+done;
+
+uninstall :
+	for i in $(OUT) $(INC); do \
+	rm -f $(MANDIR)/$$i; \
+done;
 

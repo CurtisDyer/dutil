@@ -32,18 +32,28 @@
  * Output the binary memory representation of the object pointed to by
  * `data', whose size is `n'.
  */
-void vardump(void *data, size_t n)
+void vardump(void *data, size_t n, int cols, int width)
 {
-	unsigned char *p;
-	unsigned char ascii[BYTE_COLS + 1];
+	unsigned char *p, *ascii;
 	size_t i;
 
-	for (p = data, i = 0; i < n; ++i, ++p) {
-		unsigned col = i % BYTE_COLS;
+	if (data == NULL) {
+		printf("%p:    null pointer", data);
+		return;
+	}
 
-		if (IS_NEW_ROW(i)) {
-			if (i > 0)
+	if ((ascii = malloc(cols + 1)) == NULL) {
+		perror("Memory error");
+		return;
+	}
+
+	for (p = data, i = 0; i < n; ++i, ++p) {
+		unsigned col = i % cols;
+
+		if (IS_NEW_ROW(i, cols)) {
+			if (i > 0) {
 				printf("    %s\n", ascii);
+			}
 			printf("%p:    ", (void*)p);
 		}
 
@@ -52,26 +62,32 @@ void vardump(void *data, size_t n)
 		ascii[col + 1] = '\0';
 
 		if (i + 1 == n)
-			printf("%*s%s\n", SPACES(i), " ", ascii);
+			printf("%*s%s\n", SPACES(i,cols,width), " ", ascii);
 	}
+
+	free(ascii);
 }
 
 /*
  * Output the binary representation of the file represented by `in'.
  */
-void hexdump(FILE *in)
+void fdump(FILE *in, int cols, int width)
 {
 	int c, nc, i;
-	unsigned char ascii[BYTE_COLS + 1];
+	unsigned char *ascii;
+
+	if ((ascii = malloc(cols + 1)) == NULL)
+		return;
 
 	i = 0;
 	while ((c = fgetc(in)) != EOF) {
-		unsigned col = i % BYTE_COLS;
+		unsigned col = i % cols;
 		nc = fgetc(in);
 
-		if (IS_NEW_ROW(i)) {
-			if (i > 0)
-			printf("    %s\n", ascii);
+		if (IS_NEW_ROW(i, cols)) {
+			if (i > 0) {
+				printf("    %s\n", ascii);
+			}
 			printf("0x%08x:    ", i);
 		}
 
@@ -80,7 +96,7 @@ void hexdump(FILE *in)
 		ascii[col + 1] = '\0';
 
 		if (nc == EOF)
-			printf("%*s%s\n", SPACES(i), " ", ascii);
+			printf("%*s%s\n", SPACES(i,cols,width), " ", ascii);
 
 		ungetc(nc, in);
 		i++;

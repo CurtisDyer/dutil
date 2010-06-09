@@ -1,0 +1,65 @@
+.SH SYNOPSIS
+.nf
+.B #include <dutils/hexdumps.h>
+
+void
+.BI "vardump(void *" data ", size_t " n ", int " cols ", int " width );
+
+void
+.BI "fdump(FILE *" in ", int " cols ", int " width );
+.fi
+.SH DESCRIPTION
+The
+.BR vardump (3)
+function outputs a hexdump representation of the memory of the object
+pointed to by
+.IR data ", whose size is denoted by " n ". " cols
+specifies the amount of columns to use for each byte in the output. A
+byte is defined as
+.B CHAR_BIT
+bits, which is defined in the Standard C header,
+.BR <limits.h> .
+The width between each column is specified by the
+.IR width " parameter."
+Memory will be allocated for the output of the byte columns and
+character representations at runtime. If memory allocation fails, the
+function outputs an implementation defined error message.
+
+The
+.BR fdump (3)
+function outputs a hexdump representation of the stream pointed to by
+.IR in .
+The columns and the widths between them are handled by the
+.IR cols " and " width " parameters, just as with"
+.BR vardump (3).
+.SH EXAMPLES
+.nf
+.HP
+Inspecting the memory representation of a double object:
+
+double d = 3.1416;
+int c = 8, w = 4;
+
+vardump(&d, sizeof d, c, w);
+.fi
+.SH SEE ALSO
+.BR assert (3)
+.SH AUTHOR
+Copyright (C) 2010  Curtis Dyer
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301, USA.
+
+The author may be contacted at:  <dyer85 a-t gmail dot com>
+

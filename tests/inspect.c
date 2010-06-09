@@ -37,7 +37,7 @@
  */
 enum { B, S, I, D, STR, P, ARR };
 
-struct data {
+static struct data {
 	unsigned char b;
 	short s;
 	unsigned i;
@@ -45,6 +45,10 @@ struct data {
 	char str[20];
 	char *p;
 	int arr[5];
+} foo = {
+	'B', 934, UINT_MAX-100, 3.14159265358979,
+	"Hello, world!", "Hello, world!",
+	{ 1, 1, 2, 3, 5 }
 };
 
 void intro(void)
@@ -59,6 +63,9 @@ void intro(void)
 	puts("a file as a hexdump.\n");
 }
 
+#define COLS	8
+#define WIDTH	4
+
 int main(void)
 {
 	size_t i = 0, len;
@@ -68,33 +75,31 @@ int main(void)
 		"char str[20]", "char *p",
 		"int arr[5]"
 	};
-	struct data foo = {
-		'B', 934, UINT_MAX-100, 3.14159265358979,
-		"Hello, world!", "Hello, world!",
-		{ 1, 1, 2, 3, 5 }
-	};
 
 	intro();
 
 	puts("struct data foo:");
-	vardump(&foo, sizeof foo);
+	vardump(&foo, sizeof foo, COLS, WIDTH);
 	putchar('\n');
 
 	len = sizeof member / sizeof member[0];
 	while (i < len) {
 		printf("%s:\n", member[i]);
-		switch (i) {
-			case B:		vardump(&foo.b,  sizeof foo.b);   break;
-			case S:		vardump(&foo.s,  sizeof foo.s);   break;
-			case I:		vardump(&foo.i,  sizeof foo.i);   break;
-			case D:		vardump(&foo.d,  sizeof foo.d);   break;
-			case STR:	vardump(foo.str, sizeof foo.str); break;
-			case P:		vardump(&foo.p,  sizeof foo.p);   break;
-			case ARR:	vardump(foo.arr, sizeof foo.arr); break;
+		switch (i++) {
+		case B:		vardump(&foo.b,  sizeof foo.b, COLS, WIDTH);   break;
+		case S:		vardump(&foo.s,  sizeof foo.s, COLS, WIDTH);   break;
+		case I:		vardump(&foo.i,  sizeof foo.i, COLS, WIDTH);   break;
+		case D:		vardump(&foo.d,  sizeof foo.d, COLS, WIDTH);   break;
+		case STR:	vardump(foo.str, sizeof foo.str, COLS, WIDTH); break;
+		case P:		vardump(&foo.p,  sizeof foo.p, COLS, WIDTH);   break;
+		case ARR:	vardump(foo.arr, sizeof foo.arr, COLS, WIDTH); break;
 		}
-		++i;
 		putchar('\n');
 	}
+
+	puts("\n`NULL':");
+	vardump(NULL, sizeof(void*), COLS, WIDTH);
+	putchar('\n');
 
 	return 0;
 }
