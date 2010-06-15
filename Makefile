@@ -21,18 +21,36 @@
 #
 # The author may be contacted at:  <dyer85@gmail.com>
 
+# C compiler
 CC = gcc
-ASM = nasm
-FORMAT = coff
-LIB = ar
-
 CFLAGS = -Wall -Wextra -pedantic -ansi -O3
 
+# Assembler
+# In this case, NASM is required; I like Intel syntax.
+ASM = nasm
+
+# *nix:
+#FORMAT = elf
+# Win32:
+FORMAT = coff
+
+# Librarian tool: this stores and manages the object code
+LIB = ar
+
+
+## Installation paths
+# Possible Cygwin build
+#LIB_DIR = /cygdrive/c/MinGW/lib
+#INC_DIR = /cygdrive/c/MinGW/include/dutils
+# Possible *nix build
 LIB_DIR = /usr/local/lib
 INC_DIR = /usr/local/include/dutils
 
-# Library
+# Library name
 PROJECT = libdutil.a
+
+## End of basic user configurable options ##
+
 
 # Assembly build
 asm_src := $(wildcard *.asm)
@@ -42,6 +60,7 @@ asm_obj := $(patsubst %.asm,%.o,$(asm_src))
 src := $(wildcard *.c)
 obj := $(patsubst %.c,%.o,$(src))
 hdr := $(wildcard include/*.h)
+file_hdr := $(notdir $(hdr))
 
 
 $(PROJECT) : $(obj)
@@ -54,7 +73,7 @@ $(obj) : $(src)
 $(src) : $(hdr)
 
 
-.PHONY : clean install
+.PHONY : clean install uninstall
 clean :
 	rm -f $(obj) $(asm_obj)
 
@@ -62,4 +81,10 @@ install :
 	mkdir -p $(INC_DIR)
 	cp $(hdr) $(INC_DIR)
 	mv $(PROJECT) $(LIB_DIR)
+
+uninstall :
+	rm -f $(LIB_DIR)/$(PROJECT)
+	for i in $(file_hdr); do \
+	rm -f $(INC_DIR)/$$i; \
+done;
 
